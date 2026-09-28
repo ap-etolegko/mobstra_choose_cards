@@ -1372,8 +1372,8 @@ p.rights a:hover {
     }
 }
 
-/* ===== error notice (broken window.CARDS) ===== */
-.cards-error {
+/* ===== error notice (broken window.CARDS or window.TEXTS) ===== */
+.config-error {
     max-width: 60rem;
     margin: 3rem auto;
     padding: 1rem 1.25rem;
@@ -1383,11 +1383,11 @@ p.rights a:hover {
     border-radius: 4px;
 }
 
-.cards-error h1 {
+.config-error h1 {
     font: 700 1.25rem/1.4 var(--font-body);
 }
 
-.cards-error pre {
+.config-error pre {
     margin-top: 0.5rem;
     white-space: pre-wrap;
     font:

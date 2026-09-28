@@ -21,6 +21,63 @@
                 { title: 'SkyRead', image: 'phone-sky.webp', href: '{offer}&offer_id=1' },
                 { title: 'BrainUp', image: 'phone-brain.webp', href: '{offer}&offer_id=2' }
             ];
+            // Page texts. Every key is required and strings must be non-empty; a missing or invalid key
+            // shows an error notice naming it (e.g. "window.TEXTS.footer.phone is missing") instead of the page.
+            window.TEXTS = {
+                // width/height = intrinsic image size, keep in sync with src
+                logo: { src: 'logo.webp', alt: 'ABC Mobile', href: './', width: 600, height: 110 },
+                // href must be an in-page anchor like '#about'
+                nav: [
+                    { label: 'About', href: '#about' },
+                    { label: 'Contacts', href: '#contacts' }
+                ],
+                menuLabel: 'Menu', // aria-label of the hamburger button
+                toTopLabel: 'Scroll to top', // aria-label of the "to top" button
+                hero: {
+                    title: 'the Mobile Content Provider',
+                    subtitle: 'International Company • Innovative Content • In-house Production'
+                },
+                contact: {
+                    eyebrow: 'Contact Our Team',
+                    title: 'Get in touch with us',
+                    lead: 'If you have a question or a request for us, feel free to contact us using the form on the right.'
+                },
+                form: {
+                    placeholders: {
+                        name: 'Your name *',
+                        email: 'Your e-mail address *',
+                        question: 'Your question'
+                    },
+                    submit: 'Send',
+                    sending: 'Sending',
+                    errors: {
+                        required: 'The text field is required.',
+                        email: 'The email is not a valid email.'
+                    }
+                },
+                // Copied verbatim from the original footer (including its "Adress" spelling).
+                footer: {
+                    company: 'ABCMobile OÜ',
+                    reg: 'Reg No 14710834 VAT: EE102157534',
+                    address: 'Adress: Peterburi tee 71, 11415 Tallinn',
+                    phoneLabel: 'Phone:',
+                    phone: '+3726093464',
+                    since: 2017,
+                    brand: 'ABC Mobile Group',
+                    rights: 'All rights reserved'
+                },
+                // Snackbar texts by result code of the original rd-mailform.php mailer.
+                // MF000 (success) and MF255 (generic error) are required, the rest is optional.
+                messages: {
+                    MF000: 'Successfully sent!',
+                    MF001: 'Recipients are not set!',
+                    MF002: 'Form will not work locally!',
+                    MF003: 'Please, define email field in your form!',
+                    MF004: 'Please, define type of your form!',
+                    MF254: 'Something went wrong with PHPMailer!',
+                    MF255: 'Aw, snap! Something went wrong.'
+                }
+            };
             // Contact form endpoint (POST form-data: name, email, question, form-type).
             // Empty string = no request, the form just shows the success message.
             window.CONTACT_FORM_ACTION = '';

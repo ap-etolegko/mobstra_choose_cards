@@ -1,14 +1,3 @@
-// Result codes and messages of the original rd-mailform.php mailer.
-export const MESSAGES: Record<string, string> = {
-    MF000: 'Successfully sent!',
-    MF001: 'Recipients are not set!',
-    MF002: 'Form will not work locally!',
-    MF003: 'Please, define email field in your form!',
-    MF004: 'Please, define type of your form!',
-    MF254: 'Something went wrong with PHPMailer!',
-    MF255: 'Aw, snap! Something went wrong.'
-};
-
 export interface ContactFields {
     name: string;
     email: string;

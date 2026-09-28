@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
-import { LOGO, NAV } from '@/content.ts';
+import { useTexts } from '@/hooks/use-texts.hook.ts';
 import { animateScrollTo } from '@/lib/scroll.ts';
+import type { NavLink } from '@/texts.ts';
 
 /*
  * Port of RD Navbar 2.2.5 as configured on the original site:
@@ -14,7 +15,6 @@ type Layout = 'static' | 'fixed';
 
 const STATIC_QUERY = '(min-width: 1200px)';
 const IS_IOS = /iP(hone|ad|od)/.test(navigator.userAgent);
-const LAST_NAV_HREF = NAV[NAV.length - 1].href;
 const ANCHOR_SCROLL_MS = 400;
 
 const useLayout = (): Layout => {
@@ -54,18 +54,19 @@ const useStickUp = (enabled: boolean): boolean => {
     return enabled && stuck;
 };
 
-const useActiveAnchor = (): string | null => {
+const useActiveAnchor = (nav: NavLink[]): string | null => {
     const [active, setActive] = useState<string | null>(null);
 
     useEffect(() => {
+        const lastHref = nav[nav.length - 1].href;
         const update = () => {
             const scrollTop = window.scrollY;
             // Near the document bottom the last anchor wins (upstream RD Navbar behaviour).
             if (scrollTop + window.innerHeight > document.documentElement.scrollHeight - 50) {
-                setActive(LAST_NAV_HREF);
+                setActive(lastHref);
                 return;
             }
-            for (const link of NAV) {
+            for (const link of nav) {
                 const target = document.querySelector<HTMLElement>(link.href);
                 if (!target) continue;
                 const top = target.getBoundingClientRect().top + scrollTop;
@@ -82,7 +83,7 @@ const useActiveAnchor = (): string | null => {
             window.removeEventListener('scroll', update);
             window.removeEventListener('resize', update);
         };
-    }, []);
+    }, [nav]);
 
     return active;
 };
@@ -90,7 +91,8 @@ const useActiveAnchor = (): string | null => {
 export const Header = () => {
     const layout = useLayout();
     const stuck = useStickUp(layout === 'static' && !IS_IOS);
-    const active = useActiveAnchor();
+    const { logo, nav, menuLabel } = useTexts();
+    const active = useActiveAnchor(nav);
     const [open, setOpen] = useState(false);
 
     const wrapRef = useRef<HTMLDivElement>(null);
@@ -170,7 +172,7 @@ export const Header = () => {
                                 <button
                                     type="button"
                                     class={`rd-navbar-toggle${open ? ' active' : ''}`}
-                                    aria-label="Menu"
+                                    aria-label={menuLabel}
                                     aria-expanded={open}
                                     aria-controls="rd-navbar-nav"
                                     onClick={() => setOpen((value) => !value)}
@@ -178,12 +180,12 @@ export const Header = () => {
                                     <span />
                                 </button>
                                 <div class="rd-navbar-brand">
-                                    <a class="logo-link" href={LOGO.href}>
+                                    <a class="logo-link" href={logo.href}>
                                         <img
-                                            src={LOGO.src}
-                                            alt={LOGO.alt}
-                                            width={LOGO.width}
-                                            height={LOGO.height}
+                                            src={logo.src}
+                                            alt={logo.alt}
+                                            width={logo.width}
+                                            height={logo.height}
                                         />
                                     </a>
                                 </div>
@@ -194,7 +196,7 @@ export const Header = () => {
                                     class={`rd-navbar-nav-wrap${open ? ' active' : ''}`}
                                 >
                                     <ul class="rd-navbar-nav">
-                                        {NAV.map((link) => (
+                                        {nav.map((link) => (
                                             <li
                                                 key={link.href}
                                                 class={`rd-nav-item${active === link.href ? ' active' : ''}`}
