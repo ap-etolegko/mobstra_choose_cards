@@ -1,7 +1,8 @@
 import type { ComponentChildren } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { getContactAction, submitContact, type ContactFields } from '@/contact.ts';
-import { FORM } from '@/content.ts';
+import { useTexts } from '@/hooks/use-texts.hook.ts';
+import type { Texts } from '@/texts.ts';
 
 export type SnackbarState =
     { kind: 'hidden' } | { kind: 'sending' } | { kind: 'result'; code: string };
@@ -9,6 +10,7 @@ export type SnackbarState =
 type Field = keyof ContactFields;
 type Errors = Partial<Record<Field, string>>;
 type Status = 'idle' | 'sending' | 'success';
+type ErrorTexts = Texts['form']['errors'];
 
 // regula's @Email pattern, verbatim
 const EMAIL =
@@ -18,16 +20,16 @@ const FIELDS: Field[] = ['name', 'email', 'question'];
 // rd-mailform hides the result snackbar after 3.5s
 const RESULT_TIMEOUT_MS = 3500;
 
-const validateField = (field: Field, value: string): string | undefined => {
-    if (value.trim() === '') return FORM.errors.required;
-    if (field === 'email' && !EMAIL.test(value)) return FORM.errors.email;
+const validateField = (errorTexts: ErrorTexts, field: Field, value: string): string | undefined => {
+    if (value.trim() === '') return errorTexts.required;
+    if (field === 'email' && !EMAIL.test(value)) return errorTexts.email;
     return undefined;
 };
 
-const validateAll = (values: ContactFields): Errors => {
+const validateAll = (errorTexts: ErrorTexts, values: ContactFields): Errors => {
     const errors: Errors = {};
     for (const field of FIELDS) {
-        const error = validateField(field, values[field]);
+        const error = validateField(errorTexts, field, values[field]);
         if (error) errors[field] = error;
     }
     return errors;
@@ -65,6 +67,7 @@ interface ContactFormProps {
 }
 
 export const ContactForm = ({ onSnackbar }: ContactFormProps) => {
+    const { form } = useTexts();
     const [values, setValues] = useState<ContactFields>(EMPTY);
     const [errors, setErrors] = useState<Errors>({});
     const [status, setStatus] = useState<Status>('idle');
@@ -89,7 +92,7 @@ export const ContactForm = ({ onSnackbar }: ContactFormProps) => {
     const setFieldError = (field: Field, value: string) =>
         setErrors((prev) => {
             const next = { ...prev };
-            const error = validateField(field, value);
+            const error = validateField(form.errors, field, value);
             if (error) next[field] = error;
             else delete next[field];
             return next;
@@ -113,7 +116,7 @@ export const ContactForm = ({ onSnackbar }: ContactFormProps) => {
         if (statusRef.current === 'sending') return;
 
         const current = valuesRef.current;
-        const found = validateAll(current);
+        const found = validateAll(form.errors, current);
         setErrors(found);
         if (Object.keys(found).length > 0) return;
 
@@ -150,7 +153,7 @@ export const ContactForm = ({ onSnackbar }: ContactFormProps) => {
                             class="form-control"
                             type="text"
                             name="name"
-                            placeholder={FORM.placeholders.name}
+                            placeholder={form.placeholders.name}
                             value={values.name}
                             aria-invalid={errors.name ? 'true' : undefined}
                             onInput={onInput('name')}
@@ -165,7 +168,7 @@ export const ContactForm = ({ onSnackbar }: ContactFormProps) => {
                             class="form-control"
                             type="email"
                             name="email"
-                            placeholder={FORM.placeholders.email}
+                            placeholder={form.placeholders.email}
                             value={values.email}
                             aria-invalid={errors.email ? 'true' : undefined}
                             onInput={onInput('email')}
@@ -180,7 +183,7 @@ export const ContactForm = ({ onSnackbar }: ContactFormProps) => {
                             class="form-control"
                             name="question"
                             rows={5}
-                            placeholder={FORM.placeholders.question}
+                            placeholder={form.placeholders.question}
                             value={values.question}
                             aria-invalid={errors.question ? 'true' : undefined}
                             onInput={onInput('question')}
@@ -191,7 +194,7 @@ export const ContactForm = ({ onSnackbar }: ContactFormProps) => {
                 </div>
             </div>
             <div class="box-btn">
-                <NukaButton sending={status === 'sending'}>{FORM.submit}</NukaButton>
+                <NukaButton sending={status === 'sending'}>{form.submit}</NukaButton>
             </div>
         </form>
     );

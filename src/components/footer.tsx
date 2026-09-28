@@ -3,9 +3,8 @@ import { useRef, useState } from 'preact/hooks';
 import { ContactForm, type SnackbarState } from '@/components/contact-form.tsx';
 import { AlertIcon, CheckIcon, SpinnerIcon } from '@/components/icons.tsx';
 import { Waves } from '@/components/waves.tsx';
-import { MESSAGES } from '@/contact.ts';
-import { CONTACT, FOOTER, FORM, NAV } from '@/content.ts';
 import { ANIMATE_IN_VIEW_CLASS, useAnimateInView } from '@/hooks/use-animate-in-view.hook.ts';
+import { useTexts } from '@/hooks/use-texts.hook.ts';
 
 interface SnackbarContent {
     icon: ComponentChild;
@@ -19,15 +18,16 @@ interface SnackbarContent {
 const Snackbar = ({ state }: { state: SnackbarState }) => {
     // keep the last content so the slide-out is not an empty box
     const last = useRef<SnackbarContent | null>(null);
+    const { form, messages } = useTexts();
     if (state.kind === 'sending') {
-        last.current = { icon: <SpinnerIcon class="icon snackbar-icon" />, text: FORM.sending };
+        last.current = { icon: <SpinnerIcon class="icon snackbar-icon" />, text: form.sending };
     } else if (state.kind === 'result') {
         last.current =
             state.code === 'MF000'
-                ? { icon: <CheckIcon class="icon snackbar-icon" />, text: MESSAGES.MF000 }
+                ? { icon: <CheckIcon class="icon snackbar-icon" />, text: messages.MF000 }
                 : {
                       icon: <AlertIcon class="icon snackbar-icon" />,
-                      text: MESSAGES[state.code] ?? MESSAGES.MF255
+                      text: messages[state.code] ?? messages.MF255
                   };
     }
     const content = last.current;
@@ -55,6 +55,7 @@ export const Footer = () => {
     const textAnimation = useAnimateInView<HTMLDivElement>();
     const formAnimation = useAnimateInView<HTMLDivElement>();
     const year = new Date().getFullYear();
+    const { contact, footer, nav } = useTexts();
 
     return (
         <footer class="footer bg-800 context-dark text-500 text-center position-relative pb-5">
@@ -66,9 +67,9 @@ export const Footer = () => {
                         data-animate=""
                         class={`col-md-4 col-lg-5 ${textAnimation.animated ? ANIMATE_IN_VIEW_CLASS : ''}`}
                     >
-                        <h6>{CONTACT.eyebrow}</h6>
-                        <h2>{CONTACT.title}</h2>
-                        <p class="lead">{CONTACT.lead}</p>
+                        <h6>{contact.eyebrow}</h6>
+                        <h2>{contact.title}</h2>
+                        <p class="lead">{contact.lead}</p>
                     </div>
                     <div
                         ref={formAnimation.ref}
@@ -89,7 +90,7 @@ export const Footer = () => {
                     <div class="group-x-30 group-y-10 d-flex flex-wrap align-items-center justify-content-center justify-content-xxl-between">
                         <div>
                             <ul class="list footer-list">
-                                {NAV.map((link) => (
+                                {nav.map((link) => (
                                     <li class="list-item" key={link.href}>
                                         <a class="list-link" href={link.href}>
                                             {link.label}
@@ -100,20 +101,20 @@ export const Footer = () => {
                         </div>
                     </div>
                     <p class="rights text-xxl-left mt-2">
-                        {FOOTER.company}
+                        {footer.company}
                         <br />
-                        {FOOTER.reg}
+                        {footer.reg}
                         <br />
-                        {FOOTER.address}
+                        {footer.address}
                         <br />
-                        Phone: <a href={`tel:${FOOTER.phone}`}>{FOOTER.phone}</a>
+                        {footer.phoneLabel} <a href={`tel:${footer.phone}`}>{footer.phone}</a>
                     </p>
                     <p class="rights text-xxl-left mt-2">
                         <span>
-                            © {FOOTER.since} — {year} &nbsp;
+                            © {footer.since} — {year} &nbsp;
                         </span>
-                        <span>{FOOTER.brand}</span>
-                        <span>. All rights reserved</span>
+                        <span>{footer.brand}</span>
+                        <span>. {footer.rights}</span>
                     </p>
                 </div>
             </div>
